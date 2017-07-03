@@ -1,0 +1,99 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <style type="text/css">
+        table,tr,td {
+        border: solid 1px;
+        word-wrap: break-word;
+        }
+
+    </style>
+    <script src="Scripts/jquery-1.9.1.js"></script>
+
+    <title></title>
+</head>
+<body>
+
+<button name="refresh" value="Refresh" onclick="getJson()" >Refresh</button>
+    </br>
+<form runat="server">
+    <div>
+        <table style="float: left; text-align: center; width: 50%; border: solid 1px;">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>ProcessName</th>
+                <th>WorkingSet KB</th>
+            </tr>
+            </thead>
+            <tbody id="tbody">
+            </tbody>
+        </table>
+        <div id="divHistory" style="float: right; text-align: center; width: 50%;">
+            <table style="float: left; width: 50%;">
+                <thead>
+                <tr>
+                    <th>Ram MB</th>
+                    <th>Cpu</th>
+                </tr>
+                </thead>
+                <tbody id="tbodyParams">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</form>
+</body>
+    
+     <script type="text/javascript">
+        var socket;
+
+        function getJson() {
+            
+            $.getJSON("http://localhost:8080/info/", function (data) {
+                $("#tbody").children().remove();
+                for (var i = 0; i < data.Process.length; i++) {
+                    var counter = data.Process[i];
+                    var eachrow = "<tr>"
+                        + "<td>" + counter.Id + "</td>"
+                        + "<td>" + counter.ProcessName + "</td>"
+                        + "<td>" + counter.WorkingSet/1024 + "</td>"
+                        + "</tr>";
+                    $("#tbody").append(eachrow);
+                }
+            }
+            );
+        }
+
+        $("#refresh").on('click', function () {
+            getJson();
+        });
+
+        $(document).ready(function() {
+
+            getJson();
+
+            socket = new WebSocket("ws://localhost:8080/");
+
+            socket.onclose = function(event) {
+                $("#divHistory").append("<h3>Connection was closed. :" + event.reason + "</h3>");
+            };
+
+            socket.onmessage = function(event) {
+                var socketInfo = JSON.parse(event.data);
+                var eachrow = "<tr>"
+                    + "<td>" + socketInfo.Ram + "</td>"
+                    + "<td>" + socketInfo.Cpu + "</td>"
+                    + "</tr>";
+                $("#tbodyParams").children().remove();
+                $("#tbodyParams").append(eachrow);
+            };
+
+            socket.onerror = function(error) {
+                alert("Error " + error.message);
+            };
+         
+        });
+
+    </script>
+   
+</html>

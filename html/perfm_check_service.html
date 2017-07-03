@@ -1,0 +1,87 @@
+<h2 id="http-performance-check"><strong>HTTP Performance check</strong></h2>
+
+<p>Retreives the processes’ data like memory used and process names.</p>
+
+<ul>
+<li><strong>URL</strong> <br>
+Currently it resides on </li>
+</ul>
+
+<p><a href="http://localhost:8080/info">http://localhost:8080/info</a></p>
+
+<ul>
+<li><p><strong>Method:</strong></p>
+
+<p><code>GET</code> </p></li>
+<li><p><strong>URL Params</strong></p>
+
+<p>none</p>
+
+<p><strong>Required:</strong></p>
+
+<p>none</p>
+
+<p><strong>Optional:</strong></p>
+
+<p>None</p></li>
+<li><p><strong>Data Params</strong></p>
+
+<p>None</p></li>
+<li><p><strong>Success Response:</strong></p></li>
+</ul>
+
+<p>Returns the json array which contains the processes’ information.</p>
+
+<ul>
+<li><strong>Code:</strong> 200 <br> <br>
+<strong>Content:</strong> </li>
+</ul>
+
+<p><code>{"Process":[{"Id":860,"ProcessName":"svchost","WorkingSet":21409792},{"Id":7972,"ProcessName":"ScriptedSandbox64","WorkingSet":37142528},{"Id":5628,"ProcessName":"NvStreamNetworkService","WorkingSet":10588160},{"Id":3436,"ProcessName":"Memory Compression","WorkingSet":806449152},{"Id":3004,"ProcessName":"esif_uf","WorkingSet":5521408}]}</code></p>
+
+<ul>
+<li><p><strong>Error Response:</strong></p>
+
+<ul><li><strong>Code:</strong> 404 NOT FOUND <br></li>
+<li><strong>Code:</strong> 500 SERVER ERROR <br></li></ul></li>
+<li><p><strong>Sample Call:</strong></p></li>
+</ul>
+
+
+
+<pre class="prettyprint"><code class=" hljs javascript">$.getJSON(<span class="hljs-string">"http://localhost:8080/info/"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(data)</span> {</span>
+                $(<span class="hljs-string">"#tbody"</span>).children().remove();
+                <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; data.Process.length; i++) {
+                    <span class="hljs-keyword">var</span> counter = data.Process[i];
+                    <span class="hljs-keyword">var</span> eachrow = <span class="hljs-string">"&lt;tr&gt;"</span>
+                        + <span class="hljs-string">"&lt;td&gt;"</span> + counter.Id + <span class="hljs-string">"&lt;/td&gt;"</span>
+                        + <span class="hljs-string">"&lt;td&gt;"</span> + counter.ProcessName + <span class="hljs-string">"&lt;/td&gt;"</span>
+                        + <span class="hljs-string">"&lt;td&gt;"</span> + counter.WorkingSet/<span class="hljs-number">1024</span> + <span class="hljs-string">"&lt;/td&gt;"</span>
+                        + <span class="hljs-string">"&lt;/tr&gt;"</span>;
+                    $(<span class="hljs-string">"#tbody"</span>).append(eachrow);
+                }
+            }
+            );
+        }</code></pre>
+
+<ul>
+<li><strong>Notes:</strong></li>
+</ul>
+
+<p>Just start the index.html it will run the ajax query to the localhost:8080/info as it can be seen in the sample above.</p>
+
+<h2 id="websocket-events"><strong>WEBSOCKET Events</strong></h2>
+
+<p>Notifies the websocket clients the RAM/CPU information in case of host’s high-load. In our case if it runs below &lt; 1024MB or higher than 90% of CPU usage.</p>
+
+<ul>
+<li><strong>URL</strong> <br>
+Web socket <br>
+<code>ws://localhost:8080/</code></li>
+<li><p><strong>Event format</strong> <br>
+ram and cpu values are floats <br>
+`{“Ram”:”1234”,”Cpu”:”123”}</p></li>
+<li><p><strong>Notes</strong></p></li>
+</ul>
+
+<p>You can see the sample ws connect in the attached html  </p>
